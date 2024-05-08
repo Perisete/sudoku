@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdbool.h>
+#include "get_values.h"
 
 int **allocate_board(int rows, int cols)
 {   
@@ -124,9 +125,12 @@ void draw_board(int **board, int rows, int cols)
 
 int main(){
     int rows = 9, cols = 9;
+    int *array;
     int **board = allocate_board(rows, cols);
     board = fill_board(board, rows, cols);
     draw_board(board, rows, cols);
     free_board(board, rows);
+    array = get_values(rows);
+    free(array);
     return 0;
 }
