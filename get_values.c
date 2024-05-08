@@ -29,13 +29,5 @@ int *get_values(int size){
         }while(found == 1);
         array[pos] = num;
     }
-    printf("[");
-    for(pos=0;pos<size;pos++){
-        printf("%d",array[pos]);
-        if(pos < size -1){
-            printf(", ");
-        }
-    }
-    printf("]\n");
     return array;
 }

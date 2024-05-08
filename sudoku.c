@@ -131,6 +131,14 @@ int main(){
     draw_board(board, rows, cols);
     free_board(board, rows);
     array = get_values(rows);
+    printf("[");
+    for(int i=0;i<rows;i++){
+        printf("%d", array[i]);
+        if(i < rows-1){
+            printf(", ");
+        }
+    }
+    printf("]\n");
     free(array);
     return 0;
 }
