@@ -56,6 +56,15 @@ int **zeroes_board(int **board, int rows, int cols) // Needed?
     return board;
 }
 
+struct allowed_struct init_array(struct allowed_struct as)
+{
+    for(int i=0;i<as.size;i++)
+    {
+        as.array[i] = i + 1;
+    }
+    return as;
+}
+
 void draw_board(int **board, int rows, int cols){
     int i = 0, j = 0;
     for(i;i<rows;i++)
@@ -79,32 +88,33 @@ struct allowed_struct init_struct(int s)
 struct allowed_struct check_row(int **board, struct allowed_struct as, int row, int cols)
 {
     // int *temp = (int *) malloc(cols * sizeof(int));
-    int *temp = as.array;
+    // int *temp = as.array;
     int pos = 0;
-    for(int i=1;i<=cols;i++)
+    for(int i=0;i<=as.size;i++)
     {
         for(int col=0;col<cols;col++)
         {
-            if(i == board[row][col])
+            if(as.array[i] == board[row][col])
             {
-                    break;
+                break;
             }
             if(col == cols - 1)
             {
-                temp[pos] = i;
+                as.array[pos] = i;
                 pos++;
             }
         }
     }
     as.size = pos;
-    as.array = (int *) realloc(temp, pos * sizeof(int));
-    if(temp == NULL)
+    printf("pos: %d\n", pos);
+    as.array = (int *) realloc(as.array, pos * sizeof(int));
+    if(as.array == NULL)
     {
         printf("Memory reallocation failed!\n");
-        free(temp);
+        free(as.array);
         // return 1;
     }
-    temp = as.array;
+    // temp = as.array;
     return as;
 }
 
@@ -132,6 +142,7 @@ struct allowed_struct check_col(int **board, struct allowed_struct allowed_rows,
     struct allowed_struct as;
     as.size = pos;
     as.array = res;
+    free(temp);
     return as;
 }
 
@@ -168,6 +179,7 @@ struct allowed_struct check_segment(int **board, struct allowed_struct allowed_a
     struct allowed_struct as;
     as.size = pos;
     as.array = res;
+    free(temp);
     return as;
 }
 
@@ -175,8 +187,9 @@ int **get_values(int **board, int rows, int cols)
 {
     srand(time(NULL));
     struct allowed_struct as;
-    int col, row, num, h, v, hseg = 0, vseg = 0;
+    int col, row, num, h, v, i, j, seg, pos, found = 0, hseg = 0, vseg = 0;
     as = init_struct(rows);
+    // as = init_array(as);
     for(row=0;row<rows;row++)
     {
         if(row%3 == 0 && row != 0)
@@ -190,6 +203,41 @@ int **get_values(int **board, int rows, int cols)
            {
                vseg++;
            }
+           if(row > 0)
+           {
+               pos = 0;
+               for(h=hseg+1;h<rows/3;h++)
+               {
+                   in_other_seg = check_segment(board, as, h*3, vseg*3);
+                   printf("prueba1 %d\n");
+                   print_array(in_other_seg.array, in_other_seg.size);
+                   printf("prueba2 %d\n");
+               }
+               for(v=vseg+1;v<cols/3;v++)
+               {
+                   in_other_seg  = check_segment(board, as, hseg*3, v*3);
+               }
+
+               for(i=1;j<=rows;j++)
+               {
+                   for(j=0;j<in_other_seg.size;j++)
+                   {
+                       if(i == in_other_seg.array[j])
+                       {
+                           found = 1;
+                           break;
+                       }
+                   }
+                   if(found == 1)
+                   {
+                       found = 0;
+                   }
+                   else
+                   {
+                       as.array[pos] = in_other_seg.array[j];
+                   }
+               }
+           }
            as = check_row(board, as, row, cols);
            printf("check_row\n");
            print_array(as.array, as.size);
@@ -198,14 +246,10 @@ int **get_values(int **board, int rows, int cols)
            printf("check_col\n");
            print_array(as.array, as.size);
            printf("array size2; %d\n", as.size);
-           for(h=hseg+1;h<rows/3;h++)
-           {
-               as = check_segment(board, as, h*3, vseg*3);
-           }
-           for(v=vseg+1;v<cols/3;v++)
-           {
-               as = check_segment(board, as, hseg*3, v*3);
-           }
+           as = check_segment(board, as, hseg*3, vseg*3);
+           printf("check_seg\n");
+           print_array(as.array, as.size);
+           
            printf("check_seg\n");
            print_array(as.array, as.size);
            printf("array size3; %d\n", as.size);
@@ -217,6 +261,8 @@ int **get_values(int **board, int rows, int cols)
         }
     }
     printf("fin\n");
+    free(as.array);
+    free(in_other_seg.array);
     return board;
 }
 
